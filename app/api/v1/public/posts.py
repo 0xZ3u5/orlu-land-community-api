@@ -7,6 +7,10 @@ from app.core.errors import ResourceNotFoundError
 from app.db.session import get_db
 from app.schemas.post import PostResponse
 from app.services.posts import get_post_by_slug, list_posts
+from app.services.featured_media_responses import (
+    serialize_post,
+    serialize_posts,
+)
 
 router = APIRouter(
     prefix="/posts",
@@ -18,10 +22,11 @@ router = APIRouter(
 def list_public_posts(
     db: Annotated[Session, Depends(get_db)],
 ) -> list[PostResponse]:
-    return list_posts(
+    posts = list_posts(
         db=db,
         include_unpublished=False,
     )
+    return serialize_posts(db, posts)
 
 
 @router.get("/{slug}", response_model=PostResponse)
@@ -38,4 +43,4 @@ def get_public_post(
     if post is None:
         raise ResourceNotFoundError("Post not found.")
 
-    return post
+    return serialize_post(db, post)

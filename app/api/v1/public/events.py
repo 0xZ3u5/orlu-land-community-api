@@ -7,6 +7,10 @@ from app.core.errors import ResourceNotFoundError
 from app.db.session import get_db
 from app.schemas.event import EventResponse
 from app.services.events import get_event_by_slug, list_events
+from app.services.featured_media_responses import (
+    serialize_event,
+    serialize_events,
+)
 
 router = APIRouter(
     prefix="/events",
@@ -21,10 +25,11 @@ router = APIRouter(
 def list_public_events(
     db: Annotated[Session, Depends(get_db)],
 ) -> list[EventResponse]:
-    return list_events(
+    events = list_events(
         db=db,
         include_unpublished=False,
     )
+    return serialize_events(db, events)
 
 
 @router.get(
@@ -44,4 +49,4 @@ def get_public_event(
     if event is None:
         raise ResourceNotFoundError("Event not found.")
 
-    return event
+    return serialize_event(db, event)

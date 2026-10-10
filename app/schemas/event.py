@@ -1,10 +1,10 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.event import EventStatus
-
+from app.schemas.gallery import GalleryImageResponse
 
 class EventCreate(BaseModel):
     title: str
@@ -40,5 +40,7 @@ class EventResponse(BaseModel):
     location: str | None
     status: EventStatus
     featured_media_id: UUID | None
+    featured_media_url: str | None = None
+    gallery_images: list[GalleryImageResponse] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime

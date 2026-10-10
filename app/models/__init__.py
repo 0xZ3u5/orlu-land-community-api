@@ -2,6 +2,7 @@ from app.models.author import Author
 from app.models.category import Category
 from app.models.event import Event
 from app.models.event_media import EventMedia
+from app.models.gallery_media import GalleryMedia
 from app.models.media import Media
 from app.models.page import Page
 from app.models.post import Post
@@ -14,6 +15,7 @@ __all__ = [
     "Category",
     "Event",
     "EventMedia",
+    "GalleryMedia",
     "Media",
     "Page",
     "Post",

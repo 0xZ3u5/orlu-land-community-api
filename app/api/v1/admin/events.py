@@ -9,6 +9,10 @@ from app.core.errors import ResourceNotFoundError
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.event import EventCreate, EventResponse, EventUpdate
+from app.services.featured_media_responses import (
+    serialize_event,
+    serialize_events,
+)
 from app.services.events import (
     create_event,
     delete_event,
@@ -34,7 +38,7 @@ def create_event_endpoint(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> EventResponse:
     try:
-        return create_event(
+        event = create_event(
             db=db,
             title=event_data.title,
             slug=event_data.slug,
@@ -45,6 +49,7 @@ def create_event_endpoint(
             status=event_data.status,
             featured_media_id=event_data.featured_media_id,
         )
+        return serialize_event(db, event)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -60,10 +65,11 @@ def list_admin_events_endpoint(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> list[EventResponse]:
-    return list_events(
+    events = list_events(
         db=db,
         include_unpublished=True,
     )
+    return serialize_events(db, events)
 
 
 @router.get(
@@ -83,7 +89,7 @@ def get_admin_event_endpoint(
     if event is None:
         raise ResourceNotFoundError("Event not found.")
 
-    return event
+    return serialize_event(db, event)
 
 @router.patch(
     "/{event_id}",
@@ -104,7 +110,7 @@ def update_admin_event_endpoint(
         raise ResourceNotFoundError("Event not found.")
 
     try:
-        return update_event(
+        updated_event = update_event(
             db=db,
             event=event,
             title=event_data.title,
@@ -115,7 +121,11 @@ def update_admin_event_endpoint(
             location=event_data.location,
             status=event_data.status,
             featured_media_id=event_data.featured_media_id,
+            featured_media_id_provided=(
+                "featured_media_id" in event_data.model_fields_set
+            ),
         )
+        return serialize_event(db, updated_event)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

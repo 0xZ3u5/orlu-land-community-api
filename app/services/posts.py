@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.models.post import Post, PostStatus
 from app.models.author import Author
 from app.models.category import Category
+from app.models.media import Media
 
 
 def list_posts(
@@ -107,6 +108,7 @@ def create_post(
     db=db,
     author_id=author_id,
     category_id=category_id,
+    featured_media_id=featured_media_id,
     )
 
     validate_post_status(
@@ -179,10 +181,17 @@ def update_post(
         else post.category_id
     )
 
+    new_featured_media_id = (
+        featured_media_id
+        if featured_media_id is not None
+        else post.featured_media_id
+    )
+
     validate_post_relationships(
         db=db,
         author_id=new_author_id,
         category_id=new_category_id,
+        featured_media_id=new_featured_media_id,
     )
 
     validate_post_status(
@@ -248,6 +257,7 @@ def validate_post_relationships(
     *,
     author_id: uuid.UUID,
     category_id: uuid.UUID,
+    featured_media_id: uuid.UUID | None = None,
 ) -> None:
     author = db.scalar(
         select(Author).where(Author.id == author_id)
@@ -262,3 +272,11 @@ def validate_post_relationships(
 
     if category is None:
         raise ValueError("Category not found.")
+
+    if featured_media_id is not None:
+        media = db.scalar(
+            select(Media).where(Media.id == featured_media_id)
+        )
+
+        if media is None:
+            raise ValueError("Featured media not found.")

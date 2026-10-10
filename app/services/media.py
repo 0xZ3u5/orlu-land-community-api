@@ -1,9 +1,16 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from app.models.author import Author
+from app.models.event import Event
+from app.models.event_media import EventMedia
+from app.models.gallery_media import GalleryMedia
 from app.models.media import Media, MediaType
+from app.models.post import Post
+from app.models.post_media import PostMedia
+from app.models.site_setting import SiteSetting
 
 
 def list_media(db: Session) -> list[Media]:
@@ -58,3 +65,21 @@ def delete_media(
 ) -> None:
     db.delete(media)
     db.commit()
+
+
+def is_media_in_use(
+    db: Session,
+    *,
+    media_id: uuid.UUID,
+) -> bool:
+    references = (
+        select(Post.id).where(Post.featured_media_id == media_id),
+        select(Event.id).where(Event.featured_media_id == media_id),
+        select(Author.id).where(Author.profile_media_id == media_id),
+        select(SiteSetting.id).where(SiteSetting.logo_media_id == media_id),
+        select(PostMedia.post_id).where(PostMedia.media_id == media_id),
+        select(EventMedia.event_id).where(EventMedia.media_id == media_id),
+        select(GalleryMedia.media_id).where(GalleryMedia.media_id == media_id),
+    )
+    statement = select(or_(*(query.exists() for query in references)))
+    return bool(db.scalar(statement))

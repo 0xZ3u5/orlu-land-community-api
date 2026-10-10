@@ -5,6 +5,22 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.event import Event, EventStatus
+from app.models.media import Media
+
+
+def validate_event_media(
+    db: Session,
+    featured_media_id: uuid.UUID | None,
+) -> None:
+    if featured_media_id is None:
+        return
+
+    media = db.scalar(
+        select(Media).where(Media.id == featured_media_id)
+    )
+
+    if media is None:
+        raise ValueError("Featured media not found.")
 
 
 def list_events(
@@ -81,6 +97,11 @@ def create_event(
         end_at=end_at,
     )
 
+    validate_event_media(
+        db=db,
+        featured_media_id=featured_media_id,
+    )
+
     event = Event(
         id=uuid.uuid4(),
         title=title,
@@ -111,6 +132,7 @@ def update_event(
     location: str | None = None,
     status: EventStatus | None = None,
     featured_media_id: uuid.UUID | None = None,
+    featured_media_id_provided: bool = False,
 ) -> Event:
     new_start_at = (
         start_at
@@ -128,6 +150,17 @@ def update_event(
         status
         if status is not None
         else event.status
+    )
+
+    new_featured_media_id = (
+        featured_media_id
+        if featured_media_id_provided
+        else event.featured_media_id
+    )
+
+    validate_event_media(
+        db=db,
+        featured_media_id=new_featured_media_id,
     )
 
     validate_event_status(
@@ -157,7 +190,7 @@ def update_event(
     if status is not None:
         event.status = status
 
-    if featured_media_id is not None:
+    if featured_media_id_provided:
         event.featured_media_id = featured_media_id
 
     db.commit()

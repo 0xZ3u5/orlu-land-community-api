@@ -1,10 +1,10 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from app.models.post import PostStatus
-
+from app.schemas.gallery import GalleryImageResponse
 
 class PostCreate(BaseModel):
     title: str
@@ -51,6 +51,8 @@ class PostResponse(BaseModel):
     published_at: datetime | None
     featured: bool
     featured_media_id: UUID | None
+    featured_media_url: str | None = None
+    gallery_images: list[GalleryImageResponse] = Field(default_factory=list)
     author_id: UUID
     category_id: UUID
     event_id: UUID | None
