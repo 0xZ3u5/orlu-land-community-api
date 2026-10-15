@@ -39,7 +39,7 @@ TestSessionLocal = sessionmaker(
 def verify_test_schema():
     """Require a migrated test schema; never create/drop tables implicitly."""
     inspector = inspect(test_engine)
-    required_tables = {"users", "media", "community_profiles"}
+    required_tables = {"users", "media", "community_profiles", "documents"}
     missing = required_tables - set(inspector.get_table_names())
 
     if missing:

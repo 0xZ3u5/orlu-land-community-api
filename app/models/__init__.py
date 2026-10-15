@@ -1,3 +1,4 @@
+from app.models.document import Document
 from app.models.author import Author
 from app.models.category import Category
 from app.models.community_profile import CommunityProfile
@@ -13,6 +14,7 @@ from app.models.user import User
 
 __all__ = [
     "Author",
+    "Document",
     "Category",
     "CommunityProfile",
     "Event",

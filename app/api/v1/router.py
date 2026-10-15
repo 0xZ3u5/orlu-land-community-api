@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from app.api.v1.admin.documents import router as admin_documents_router
+from app.api.v1.public.documents import router as public_documents_router
 
 from app.api.v1.admin.categories import router as admin_categories_router
 from app.api.v1.auth.auth import router as auth_router
@@ -47,3 +49,6 @@ router.include_router(public_home_router)
 router.include_router(admin_community_profiles_router)
 router.include_router(public_community_profiles_router)
 router.include_router(public_search_router)
+
+router.include_router(admin_documents_router)
+router.include_router(public_documents_router)
