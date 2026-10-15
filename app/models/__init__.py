@@ -1,5 +1,6 @@
 from app.models.author import Author
 from app.models.category import Category
+from app.models.community_profile import CommunityProfile
 from app.models.event import Event
 from app.models.event_media import EventMedia
 from app.models.gallery_media import GalleryMedia
@@ -13,6 +14,7 @@ from app.models.user import User
 __all__ = [
     "Author",
     "Category",
+    "CommunityProfile",
     "Event",
     "EventMedia",
     "GalleryMedia",

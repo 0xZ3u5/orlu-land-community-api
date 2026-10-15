@@ -9,6 +9,7 @@ from app.db.base import Base
 from app.models import (
     Author,
     Category,
+    CommunityProfile,
     Event,
     EventMedia,
     Media,

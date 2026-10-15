@@ -4,6 +4,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.models.author import Author
+from app.models.community_profile import CommunityProfile
 from app.models.event import Event
 from app.models.event_media import EventMedia
 from app.models.gallery_media import GalleryMedia
@@ -76,6 +77,9 @@ def is_media_in_use(
         select(Post.id).where(Post.featured_media_id == media_id),
         select(Event.id).where(Event.featured_media_id == media_id),
         select(Author.id).where(Author.profile_media_id == media_id),
+        select(CommunityProfile.id).where(
+            CommunityProfile.profile_media_id == media_id
+        ),
         select(SiteSetting.id).where(SiteSetting.logo_media_id == media_id),
         select(PostMedia.post_id).where(PostMedia.media_id == media_id),
         select(EventMedia.event_id).where(EventMedia.media_id == media_id),

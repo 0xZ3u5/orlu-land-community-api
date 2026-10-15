@@ -19,6 +19,12 @@ from app.api.v1.public.pages import router as public_pages_router
 from app.api.v1.public.site import router as public_site_router
 from app.api.v1.public.home import router as public_home_router
 from app.api.v1.public.search import router as public_search_router
+from app.api.v1.admin.community_profiles import (
+    router as admin_community_profiles_router,
+)
+from app.api.v1.public.community_profiles import (
+    router as public_community_profiles_router,
+)
 
 router = APIRouter(prefix="/api/v1")
 
@@ -38,4 +44,6 @@ router.include_router(admin_pages_router)
 router.include_router(public_site_router)
 router.include_router(admin_site_router)
 router.include_router(public_home_router)
+router.include_router(admin_community_profiles_router)
+router.include_router(public_community_profiles_router)
 router.include_router(public_search_router)
